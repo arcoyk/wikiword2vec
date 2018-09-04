@@ -22,13 +22,23 @@ class MyHTMLParser(HTMLParser):
           f.write('\n'.join(self.buf))
       print(self.title, data)
 
+def path2dir(path):
+  return '/'.join(path)
+
 def create_title2link():
   parser = MyHTMLParser()
-  root = 'data/AA'
-  for filename in os.listdir(root): 
-    path = '/'.join([root, filename])
-    with open(path) as f:
-      parser.feed(f.read())
+  root_path = ['data', 'pages']
+  for d in os.listdir(path2dir(root_path)):
+    if '.DS_Store' == d:
+      continue
+    page_path = root_path + [d]
+    for f in os.listdir(path2dir(page_path)):
+      if '.DS_Store' == f:
+        continue
+      file_path = page_path + [f]
+      print(file_path)
+      with open(path2dir(file_path)) as f:
+        parser.feed(f.read())
 
 def clear_file():
   with open('data/t_a', 'w') as f:
