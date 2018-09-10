@@ -6,12 +6,12 @@ import sys
 TEXT_DIR = '../data/t_a'
 D = 2
 LEARN = False
-MODEL_DIR = '../data/2d.model'
+MODEL_DIR = '../data/3d.model'
 MODEL = None
 LANG = 'jp'
 
 def learn(path):
-  sentences = wv.LineSentence(path, limit=500)
+  sentences = wv.LineSentence(path, limit=6000)
   print('Got sentences. Now learning...')
   model = wv.Word2Vec(sentences, size=D)
   for epoch in range(20):
@@ -30,6 +30,9 @@ def test(MODEL_DIR):
     print('word:', w)
     print('simi:', model.wv.most_similar(w))
     print('vec:', model.wv[w])
+  print("===================================")
+  print("Word count:", len(model.wv.vocab))
+  print("===================================")
 
 # learn(TEXT_DIR)
 test(MODEL_DIR)

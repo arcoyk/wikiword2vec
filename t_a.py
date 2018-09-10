@@ -1,26 +1,54 @@
 from html.parser import HTMLParser
 import os
+import pickle
+import MeCab
+
+def wakati(text):
+  tagger = MeCab.Tagger("-Owakati")
+  return tagger.parse(text).split(' ')
+
+def is_a_jp_noun(word):
+  # Not really good...
+  MecabMode = '-Ochasen'
+  tagger = MeCab.Tagger(MecabMode)
+  k = tagger.parse(word)
+  return '名詞' in tagger.parse(word)
+
+def only_noun(words):
+  return list(filter(lambda x: is_a_jp_noun(x), words))
 
 class MyHTMLParser(HTMLParser):
-  buf = []
   title = ''
+  buf = ''
   a_flag = False
+  rst = []
+  cnt = 0
   def handle_starttag(self, tag, attrs):
     if tag == 'doc':
       self.title = dict(attrs)['title']
+      self.buf = ''
     if tag == 'a':
       self.a_flag = True
 
   def handle_endtag(self, tag):
-    self.a_flag = False
+    if tag == 'a':
+      self.a_flag = False
+    if tag == 'doc':
+      words = wakati(self.buf.replace('\n', ''))
+      print(words)
+      nouns = only_noun(words)
+      print(nouns)
+      self.rst += nouns
+      self.rst += ['\n']
+      self.cnt += 1
+      print(self.rst)
+      if (self.cnt > 4):
+        with open('data/t_a', 'a') as f:
+          f.write(' ' + ' '.join(self.rst))
+        exit()
 
   def handle_data(self, data):
-    if self.a_flag:
-      self.buf.append(self.title + ' ' + data)
-      if len(self.buf) > 1000:
-        with open('data/t_a', 'a') as f:
-          f.write('\n'.join(self.buf))
-      print(self.title, data)
+    self.buf += data
 
 def path2dir(path):
   return '/'.join(path)
