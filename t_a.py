@@ -18,7 +18,7 @@ def only_noun(words):
   return list(filter(lambda x: is_a_jp_noun(x), words))
 
 class MyHTMLParser(HTMLParser):
-  title = ''
+  ts = []
   buf = ''
   a_flag = False
   rst = []
@@ -26,6 +26,7 @@ class MyHTMLParser(HTMLParser):
   def handle_starttag(self, tag, attrs):
     if tag == 'doc':
       self.title = dict(attrs)['title']
+      self.ts.append(self.title)
       self.buf = ''
     if tag == 'a':
       self.a_flag = True
@@ -35,16 +36,17 @@ class MyHTMLParser(HTMLParser):
       self.a_flag = False
     if tag == 'doc':
       words = wakati(self.buf.replace('\n', ''))
-      print(words)
       nouns = only_noun(words)
-      print(nouns)
       self.rst += nouns
       self.rst += ['\n']
       self.cnt += 1
-      print(self.rst)
       if (self.cnt > 4):
         with open('data/t_a', 'a') as f:
           f.write(' ' + ' '.join(self.rst))
+          self.rst = []
+        with open('data/ts', 'a') as f:
+          f.write(' ' + ' '.join(self.ts))
+          self.ts = []
         exit()
 
   def handle_data(self, data):
