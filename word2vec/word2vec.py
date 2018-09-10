@@ -34,5 +34,5 @@ def test(MODEL_DIR):
   print("Word count:", len(model.wv.vocab))
   print("===================================")
 
-# learn(TEXT_DIR)
+learn(TEXT_DIR)
 test(MODEL_DIR)
